@@ -6,6 +6,8 @@ import argparse
 import sys
 import re
 import socket
+from sty import fg, rs
+
 
 parser = argparse.ArgumentParser(description='Simple tool for domain busting')
 
@@ -29,6 +31,13 @@ except:
     print(domain)
     sys.exit("A major fuckup happened, please submit an issue on github")
 
+def isIP(domain):
+    ips = re.findall(r"^(([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])\.){3}([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])", domain)
+    if len(ips) == 0:
+        return 0
+    else:
+        return 1
+
 
 def scanForDomains(path):
     try:
@@ -39,10 +48,13 @@ def scanForDomains(path):
     for i in domains:
         if len(i) == 0:
             continue
+        if isIP(i):
+            print(fg(72,251,0) + "FOUND IP: " + fg.rs + i)
+            continue
         try:
             socket.gethostbyname(i)
         except socket.gaierror:
-            print("COULD NOT RESOLVE DNS: " + i)
+            print(fg(72,251,0) + "COULD NOT RESOLVE DNS: " + fg.rs + i)
         except:
             pass
     #print(domains)
